@@ -10,4 +10,4 @@ if (config.isDev) {
   await bot.api.setWebhook(buildWebhookUrl(bot.token))
 }
 
-await server.listen({ port: config.SERVER_PORT })
+await server.listen({ port: config.PORT })

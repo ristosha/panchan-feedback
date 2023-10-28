@@ -15,6 +15,6 @@ const logLevels = [
 export const config = cleanEnv(process.env, {
   BOT_TOKEN: str(),
   WEBHOOK_URL: url(),
-  SERVER_PORT: port(),
+  PORT: port(),
   LOG_LEVEL: str({ default: 'info', choices: logLevels })
 })
