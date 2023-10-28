@@ -1,4 +1,4 @@
-import { cleanEnv, port, str, url } from 'envalid'
+import { cleanEnv, port, str, url, num } from 'envalid'
 
 await import('dotenv/config')
 
@@ -14,6 +14,7 @@ const logLevels = [
 
 export const config = cleanEnv(process.env, {
   BOT_TOKEN: str(),
+  BOT_ADMIN_ID: num(),
   WEBHOOK_URL: url(),
   PORT: port(),
   LOG_LEVEL: str({ default: 'info', choices: logLevels })
