@@ -6,7 +6,8 @@
   "scripts": {
     "start": "rimraf ./dist && tsc && tsc-alias && node dist/index.js",
     "start:dev": "tsx src/index.ts",
-    "build": "rimraf ./dist && tsc && tsc-alias"
+    "build": "rimraf ./dist && tsc && tsc-alias",
+    "postinstall": "prisma generate"
   },
   "devDependencies": {
     "@types/node": "^20.8.9",
