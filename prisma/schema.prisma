@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  telegramId BigInt   @unique @map("telegram_id")
+  locale     String?
+  bots       Bot[]
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
+
+model Bot {
+  id           Int      @id @default(autoincrement())
+  token        String   @unique @db.VarChar(64)
+  telegramId   BigInt   @unique @map("telegram_id")
+  ownerId      Int      @map("owner_id")
+  username     String
+  startMessage String?  @map("start_message") @db.VarChar(4000)
+  createdAt    DateTime @default(now())
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  messages Message[]
+  chats    BotChat[]
+  users    BotUser[]
+
+  @@index([ownerId])
+  @@map("bots")
+}
+
+model BotUser {
+  botId      Int     @map("bot_id")
+  telegramId BigInt  @map("telegram_id")
+  blocked    Boolean @default(false)
+
+  bot      Bot       @relation(fields: [botId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  messages Message[]
+
+  @@id([botId, telegramId])
+  @@map("bot_users")
+}
+
+model BotChat {
+  botId      Int     @map("bot_id")
+  telegramId BigInt  @map("telegram_id")
+  title      String? @db.VarChar(255)
+  isActive   Boolean @default(false) @map("is_active")
+  locale     String?
+
+  bot Bot @relation(fields: [botId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([botId, telegramId])
+  @@map("bot_chats")
+}
+
+model Message {
+  botId           Int      @map("bot_id")
+  userTelegramId  BigInt   @map("user_telegram_id")
+  messageId       BigInt   @map("message_id")
+  messageThreadId BigInt?  @map("message_thread_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  bot     Bot     @relation(fields: [botId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  botUser BotUser @relation(fields: [botId, userTelegramId], references: [botId, telegramId])
+
+  @@id([userTelegramId, messageId])
+  @@index([botId])
+  @@map("messages")
+}
