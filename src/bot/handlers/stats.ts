@@ -1,10 +1,17 @@
 import { Composer } from 'grammy'
 import { MyContext } from '~/bot/types.js'
+import { config } from '~/config.js'
+import { logger } from '~/logger.js'
 import storage from '~/storage.js'
 
 export const stats = new Composer<MyContext>()
 
-stats.command('stats', async (ctx) => {
+stats.command('stats', async (ctx, next) => {
+  if (ctx.from?.id !== config.BOT_ADMIN_ID) {
+    logger.warn(`unauthorized access to /stats by ${ctx.from?.id ?? ''}`)
+    return next()
+  }
+
   const [usersCount, botsCount, botUsersCount, botChatsCount, messagesCount] = await Promise.all([
     storage.user.count(),
     storage.bot.count(),
