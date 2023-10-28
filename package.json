@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/index.js",
     "start:dev": "tsx src/index.ts",
-    "build": "rimraf ./dist && tsc && tsc-alias",
+    "build": "npx rimraf ./dist && npx tsc && npx tsc-alias",
     "postinstall": "prisma generate"
   },
   "devDependencies": {
