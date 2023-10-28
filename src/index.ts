@@ -6,8 +6,8 @@ import { buildWebhookUrl } from '~/utils/url.js'
 if (config.isDev) {
   await bot.start()
 } else {
-  await bot.api.deleteWebhook()
-  await bot.api.setWebhook(buildWebhookUrl(bot.token))
+  // await bot.api.deleteWebhook()
+  // await bot.api.setWebhook(buildWebhookUrl(bot.token))
 }
 
 await server.listen({ port: config.PORT })
