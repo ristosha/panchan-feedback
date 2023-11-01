@@ -1,10 +1,9 @@
 import fastify from 'fastify'
-import { Bot, BotError, webhookCallback } from 'grammy'
+import { BotError, webhookCallback } from 'grammy'
 import { bot } from '~/bot/index.js'
 import { config } from '~/config.js'
 import { buildFeedbackBot } from '~/feedback/index.js'
 import { logger } from '~/logger.js'
-import storage from '~/storage.js'
 import { botTokenRegex } from '~/utils/bot-api.js'
 
 export const server = fastify()
@@ -18,7 +17,7 @@ server.setErrorHandler((error, _, reply) => {
   }
 })
 
-server.post(`/${config.BOT_TOKEN}`, webhookCallback (bot, 'fastify'))
+server.post(`/${config.BOT_TOKEN}`, webhookCallback(bot, 'fastify'))
 
 server.post('/:token', async (request, reply) => {
   const { token } = request.params as any
@@ -26,11 +25,12 @@ server.post('/:token', async (request, reply) => {
     return reply.status(500).send({ error: 'Invalid token format. ' })
   }
 
-  const bot = await buildFeedbackBot(token)
+  const built = await buildFeedbackBot(token)
 
-  if (bot == null) {
+  if (built == null) {
     return reply.status(500).send({ error: 'Not served. ' })
   }
 
-  webhookCallback(bot, 'fastify')(request, reply)
+  logger.debug('bot build, deriving to grammy')
+  webhookCallback(built, 'fastify')(request, reply)
 })

@@ -1,5 +1,6 @@
 import { ReplyMode } from '@prisma/client'
 import { Context } from 'grammy'
+import { logger } from '~/logger.js'
 import storage from '~/storage.js'
 
 type Chat = { telegramId: bigint; locale: string | null; isActive: boolean; }
@@ -25,10 +26,12 @@ export async function answer (ctx: Context, replyMode: ReplyMode = 'COPY') {
 
   if (message == null) return false
 
+  logger.debug(`using reply mode ${replyMode}`)
   const answered = replyMode === 'COPY'
     ? await ctx.copyMessage(Number(message.userTelegramId))
     : await ctx.forwardMessage(Number(message.userTelegramId))
 
+  logger.debug(`new message!`)
   await storage.message.create({
     data: {
       messageId: answered.message_id - 1,
@@ -46,6 +49,8 @@ export async function question (ctx: Context, dBot: any) {
   const { message_id: messageId, message_thread_id: messageThreadId } = await ctx.forwardMessage(id)
 
   await getBotUser(dBot.id, ctx.from!.id)
+  logger.debug('loaded bot user')
+
   await storage.message.create({
     data: {
       messageId,
@@ -54,6 +59,8 @@ export async function question (ctx: Context, dBot: any) {
       userTelegramId: ctx.from!.id
     }
   })
+
+  logger.debug('new user question is observing!')
 }
 
 function getFeedbackChat (chats: Chat[], ownerId: number | bigint) {

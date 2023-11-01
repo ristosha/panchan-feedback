@@ -1,6 +1,7 @@
 import { Bot } from 'grammy'
 import { answer, question } from '~/feedback/aq.js'
 import { registerChat } from '~/feedback/chats.js'
+import { logger } from '~/logger.js'
 import storage from '~/storage.js'
 
 
@@ -29,6 +30,7 @@ export async function buildFeedbackBot (token: string) {
   const chatMiddleware = registerChat(dBot.id)
 
   bot.on('message').use(chatMiddleware).use(async (ctx, next) => {
+    logger.debug(`new message to bot!`)
     await next()
   })
 
