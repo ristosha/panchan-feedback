@@ -18,7 +18,7 @@ server.setErrorHandler((error, _, reply) => {
   }
 })
 
-server.post(`/${config.BOT_TOKEN}`, webhookCallback(bot, 'fastify'))
+server.post(`/${config.BOT_TOKEN}`, webhookCallback (bot, 'fastify'))
 
 server.post('/:token', async (request, reply) => {
   const { token } = request.params as any
@@ -32,6 +32,5 @@ server.post('/:token', async (request, reply) => {
     return reply.status(500).send({ error: 'Not served. ' })
   }
 
-  await bot.init()
-  await bot.handleUpdate(request.body as any)
+  webhookCallback(bot, 'fastify')(request, reply)
 })

@@ -95,8 +95,6 @@ botChatList.select(
       return true
     },
     isSet: (ctx, key) => {
-      logger.error(ctx.state.data?.chats)
-      logger.error({ key })
       return ctx.state.data?.chats?.find(c => c.telegramId.toString() === key)?.isActive
     }
   }

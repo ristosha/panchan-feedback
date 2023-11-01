@@ -72,7 +72,7 @@ export async function buildFeedbackBot (token: string) {
     .chatType('private')
     .on('message', async (ctx) => {
       if (ctx.from.id === Number(dBot.owner.telegramId)) {
-        const res = await answer(ctx)
+        const res = await answer(ctx, dBot.replyMode)
         if (res) return
       }
       await question(ctx, dBot)
@@ -81,7 +81,7 @@ export async function buildFeedbackBot (token: string) {
   bot
     .chatType(['group', 'supergroup'])
     .on('message', async (ctx) => {
-      await answer(ctx)
+      await answer(ctx, dBot.replyMode)
     })
 
   return bot

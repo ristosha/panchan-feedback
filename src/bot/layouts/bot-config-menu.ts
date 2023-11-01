@@ -1,5 +1,6 @@
 import { InlineKeyboard } from 'grammy'
 import { deleteMenuFromContext, MenuMiddleware, MenuTemplate } from 'grammy-inline-menu'
+import { botAnswerMode } from '~/bot/layouts/bot-answer-mode-menu.js'
 import { botChatList } from '~/bot/layouts/bot-chat-list-menu.js'
 import { botDelete } from '~/bot/layouts/bot-delete-menu.js'
 import { backButtons } from '~/bot/layouts/buttons.js'
@@ -94,7 +95,19 @@ botConfig.interact(
 botConfig.submenu(
   ctx => ctx.t('bot-config-menu.chats'),
   'chats',
-  botChatList
+  botChatList,
+  {
+    hide: (ctx) => ctx.state.data.rendered === false,
+  }
+)
+
+botConfig.submenu(
+  ctx => ctx.t('bot-config-menu.answer-mode'),
+  'answer',
+  botAnswerMode,
+  {
+    hide: (ctx) => ctx.state.data.rendered === false,
+  }
 )
 
 botConfig.submenu(

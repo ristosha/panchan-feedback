@@ -7,6 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ReplyMode {
+  FORWARD
+  COPY
+
+  @@map("reply_mode")
+}
+
 model User {
   id         Int      @id @default(autoincrement())
   telegramId BigInt   @unique @map("telegram_id")
@@ -18,13 +25,14 @@ model User {
 }
 
 model Bot {
-  id           Int      @id @default(autoincrement())
-  token        String   @unique @db.VarChar(64)
-  telegramId   BigInt   @unique @map("telegram_id")
-  ownerId      Int      @map("owner_id")
+  id           Int       @id @default(autoincrement())
+  token        String    @unique @db.VarChar(64)
+  telegramId   BigInt    @unique @map("telegram_id")
+  ownerId      Int       @map("owner_id")
   username     String
-  startMessage String?  @map("start_message") @db.VarChar(4000)
-  createdAt    DateTime @default(now())
+  startMessage String?   @map("start_message") @db.VarChar(4000)
+  replyMode    ReplyMode @default(COPY) @map("reply_mode")
+  createdAt    DateTime  @default(now())
 
   owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   messages Message[]

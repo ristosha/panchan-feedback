@@ -1,10 +1,11 @@
+import { ReplyMode } from '@prisma/client'
 import { Context } from 'grammy'
 import storage from '~/storage.js'
 
 type Chat = { telegramId: bigint; locale: string | null; isActive: boolean; }
 
 
-export async function answer (ctx: Context) {
+export async function answer (ctx: Context, replyMode: ReplyMode = 'COPY') {
   if (ctx.message?.reply_to_message == null) return false
 
   const { message_id: messageId, message_thread_id: messageThreadId } = ctx.message.reply_to_message
@@ -24,7 +25,10 @@ export async function answer (ctx: Context) {
 
   if (message == null) return false
 
-  const answered = await ctx.copyMessage(Number(message.userTelegramId))
+  const answered = replyMode === 'COPY'
+    ? await ctx.copyMessage(Number(message.userTelegramId))
+    : await ctx.forwardMessage(Number(message.userTelegramId))
+
   await storage.message.create({
     data: {
       messageId: answered.message_id - 1,
