@@ -31,6 +31,6 @@ server.post('/:token', async (request, reply) => {
     return reply.status(500).send({ error: 'Not served. ' })
   }
 
-  logger.debug('bot build, deriving to grammy')
-  webhookCallback(built, 'fastify')(request, reply)
+  await built.init()
+  await built.handleUpdate(request.body as any)
 })
