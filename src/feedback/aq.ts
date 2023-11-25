@@ -20,11 +20,51 @@ export async function answer (ctx: Context, replyMode: ReplyMode = 'COPY') {
     },
     select: {
       botId: true,
-      userTelegramId: true
+      userTelegramId: true,
+      bot: {
+        select: {
+          owner: {
+            select: {
+              telegramId: true
+            }
+          }
+        }
+      }
     }
   })
 
   if (message == null) return false
+
+  if (ctx.message.text?.startsWith('/ban')) {
+    const { text } = ctx.message
+    if (text?.includes('@') && !text?.includes(ctx.me.username)) return
+
+    if (ctx.from?.id !== Number(message.bot.owner.telegramId)) {
+      await ctx.reply('🔞')
+      return
+    }
+    const botId = message.botId
+    const telegramId = message.userTelegramId
+
+    const user = await storage.botUser.findUnique({ where: { botId_telegramId: { botId, telegramId } } })
+    const state = user?.muted ?? false
+
+    await storage.botUser.upsert({
+      where: { botId_telegramId: { botId, telegramId } },
+      create: { botId, telegramId },
+      update: { muted: !state }
+    })
+
+    if (state) {
+      // unmute
+      await ctx.reply('🙉')
+    } else {
+      // mute
+      await ctx.reply('🙊')
+    }
+
+    return
+  }
 
   logger.debug(`using reply mode ${replyMode}`)
   const answered = replyMode === 'COPY'
@@ -48,6 +88,7 @@ export async function question (ctx: Context, dBot: any) {
   const { id } = getFeedbackChat(dBot.chats, dBot.owner.telegramId)
 
   const user = await getBotUser(dBot.id, ctx.from!.id)
+  console.log({ user })
   if (user.muted) return
 
   const { message_id: messageId, message_thread_id: messageThreadId } = await ctx.forwardMessage(id)
