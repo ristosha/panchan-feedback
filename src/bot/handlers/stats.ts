@@ -13,12 +13,13 @@ stats.command('stats', async (ctx, next) => {
     return next()
   }
 
-  const [usersCount, botsCount, botUsersCount, botChatsCount, messagesCount] = await Promise.all([
+  const [usersCount, botsCount, botUsersCount, botChatsCount, messagesCount, blockedCount] = await Promise.all([
     storage.user.count(),
     storage.bot.count(),
     storage.botUser.count(),
     storage.botChat.count(),
-    storage.message.count()
+    storage.message.count(),
+    storage.botUser.count({ where: { blocked: true } })
   ])
 
   const lastBots = await storage.bot.findMany({
@@ -44,7 +45,7 @@ stats.command('stats', async (ctx, next) => {
   let message = `📊 Bot Statistics:\n\n`
   message += `👥 Users: ${usersCount}\n`
   message += `🤖 Bots: ${botsCount}\n`
-  message += `👤 Bot Users: ${botUsersCount}\n`
+  message += `👤 Bot Users: ${botUsersCount} (${blockedCount} blocked)\n`
   message += `💬 Bot Chats: ${botChatsCount}\n`
   message += `✉️ Messages: ${messagesCount}\n\n`
   message += `🔎 Last 15 Bots (owner - user count/message count):\n`

@@ -46,10 +46,14 @@ export async function answer (ctx: Context, replyMode: ReplyMode = 'COPY') {
 
 export async function question (ctx: Context, dBot: any) {
   const { id } = getFeedbackChat(dBot.chats, dBot.owner.telegramId)
+
+  const user = await getBotUser(dBot.id, ctx.from!.id)
+  if (user.blocked) return
+
   const { message_id: messageId, message_thread_id: messageThreadId } = await ctx.forwardMessage(id)
 
-  await getBotUser(dBot.id, ctx.from!.id)
   logger.debug('loaded bot user')
+
 
   await storage.message.create({
     data: {

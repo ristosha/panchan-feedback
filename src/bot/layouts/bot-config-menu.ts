@@ -83,7 +83,7 @@ botConfig.interact(
       await ctx.reply(text, {
         reply_markup: {
           inline_keyboard: cancel.inline_keyboard,
-          force_reply: true,
+          force_reply: true
         }
       })
 
@@ -97,7 +97,7 @@ botConfig.submenu(
   'chats',
   botChatList,
   {
-    hide: (ctx) => ctx.state.data.rendered === false,
+    hide: (ctx) => ctx.state.data.rendered === false
   }
 )
 
@@ -106,7 +106,7 @@ botConfig.submenu(
   'answer',
   botAnswerMode,
   {
-    hide: (ctx) => ctx.state.data.rendered === false,
+    hide: (ctx) => ctx.state.data.rendered === false
   }
 )
 

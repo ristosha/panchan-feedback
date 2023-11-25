@@ -80,11 +80,39 @@ export async function buildFeedbackBot (token: string) {
       await question(ctx, dBot)
     })
 
-  bot
-    .chatType(['group', 'supergroup'])
-    .on('message', async (ctx) => {
-      await answer(ctx, dBot.replyMode)
+  const groups = bot.chatType(['group', 'supergroup'])
+
+  groups.command('ban', async (ctx) => {
+    if (ctx.from.id !== Number(dBot.owner.telegramId)) return
+
+    const reply = ctx.message.reply_to_message
+    if (reply == null || reply.from == null || reply.from.id === ctx.from.id) return
+
+    const botId = dBot.id
+    const telegramId = reply.from.id
+
+    const user = await storage.botUser.findUnique({ where: { botId_telegramId: { botId, telegramId } } })
+    const state = user?.blocked ?? false
+
+    await storage.botUser.upsert({
+      where: { botId_telegramId: { botId, telegramId } },
+      create: { botId, telegramId },
+      update: { blocked: !state }
     })
+
+    if (state) {
+      // unmute
+      await ctx.reply('🙉')
+    } else {
+      // mute
+      await ctx.reply('🙊')
+    }
+
+  })
+
+  groups.on('message', async (ctx) => {
+    await answer(ctx, dBot.replyMode)
+  })
 
   return bot
 }
