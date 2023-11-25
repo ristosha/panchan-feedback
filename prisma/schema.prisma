@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -48,6 +47,7 @@ model BotUser {
   botId      Int     @map("bot_id")
   telegramId BigInt  @map("telegram_id")
   blocked    Boolean @default(false)
+  muted      Boolean @default(false)
 
   bot      Bot       @relation(fields: [botId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   messages Message[]

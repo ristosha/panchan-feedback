@@ -19,7 +19,7 @@ stats.command('stats', async (ctx, next) => {
     storage.botUser.count(),
     storage.botChat.count(),
     storage.message.count(),
-    storage.botUser.count({ where: { blocked: true } })
+    storage.botUser.count({ where: { muted: true } })
   ])
 
   const lastBots = await storage.bot.findMany({

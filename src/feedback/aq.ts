@@ -48,7 +48,7 @@ export async function question (ctx: Context, dBot: any) {
   const { id } = getFeedbackChat(dBot.chats, dBot.owner.telegramId)
 
   const user = await getBotUser(dBot.id, ctx.from!.id)
-  if (user.blocked) return
+  if (user.muted) return
 
   const { message_id: messageId, message_thread_id: messageThreadId } = await ctx.forwardMessage(id)
 

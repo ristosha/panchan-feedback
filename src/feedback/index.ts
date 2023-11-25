@@ -83,7 +83,10 @@ export async function buildFeedbackBot (token: string) {
   const groups = bot.chatType(['group', 'supergroup'])
 
   groups.command('ban', async (ctx) => {
-    if (ctx.from.id !== Number(dBot.owner.telegramId)) return
+    if (ctx.from.id !== Number(dBot.owner.telegramId)) {
+      await ctx.reply('🔞')
+      return
+    }
 
     const reply = ctx.message.reply_to_message
     if (reply == null || reply.from == null || reply.from.id === ctx.from.id) return
@@ -92,12 +95,12 @@ export async function buildFeedbackBot (token: string) {
     const telegramId = reply.from.id
 
     const user = await storage.botUser.findUnique({ where: { botId_telegramId: { botId, telegramId } } })
-    const state = user?.blocked ?? false
+    const state = user?.muted ?? false
 
     await storage.botUser.upsert({
       where: { botId_telegramId: { botId, telegramId } },
       create: { botId, telegramId },
-      update: { blocked: !state }
+      update: { muted: !state }
     })
 
     if (state) {
